@@ -12,7 +12,7 @@ public class ItemRepository {
     // multi thread 환경을 고려하여 HashMap 사용은 지양한다.
     private static final Map<Long, Item> store = new HashMap<>(); // static
 
-    private static Long sequence = 0L; // static
+    private static long sequence = 0L;
 
     public Item save(Item item) {
         item.setId(++sequence);
@@ -28,12 +28,11 @@ public class ItemRepository {
         return new ArrayList<>(store.values());
     }
 
-    // itemId는 사용이 안되니, itemId를 제외한  updateItemDTO 객체를 만드는 것이 바람직
-    public void update(Long id, Item updateParam) {
-        Item findItem = findById(id);
-        findItem.setItemName(updateParam.getItemName());
-        findItem.setPrice(updateParam.getPrice());
-        findItem.setQuantity(updateParam.getQuantity());
+    public void update(Long id, Item updatedItem) {
+        Item item = findById(id);
+        item.setItemName(updatedItem.getItemName());
+        item.setPrice(updatedItem.getPrice());
+        item.setQuantity(updatedItem.getQuantity());
     }
 
     public void clearStore() {
