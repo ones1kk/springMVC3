@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class BasicItemController {
 
     private final ItemRepository itemRepository;
+
+    /*
+     테스트용 데이터 추가
+  */
+    @PostConstruct
+    public void init() {
+        itemRepository.save(new Item("itemA", 10000, 10));
+        itemRepository.save(new Item("itemB", 20000, 20));
+    }
 
     @GetMapping
     public String items(Model model) {
@@ -41,16 +51,17 @@ public class BasicItemController {
         return "basic/addForm";
     }
 
-    //    @PostMapping("/add")
-    public String addItemV1(@RequestParam String itemName,
+    //    @PostMapping("add")
+    public String addItemV1(
+        @RequestParam String itemName,
         @RequestParam int price,
         @RequestParam Integer quantity,
         Model model
     ) {
         Item item = new Item();
         item.setItemName(itemName);
-        item.setQuantity(quantity);
         item.setPrice(price);
+        item.setQuantity(quantity);
 
         itemRepository.save(item);
 
@@ -59,17 +70,15 @@ public class BasicItemController {
         return "basic/item";
     }
 
-//    @PostMapping("add")
-//    public String addItemV2(Item item) {
-//        itemRepository.save(item);
-//
-////        model.addAttribute("item", item);  // 자돋 추가, 생략 가능
-//
-//        return "basic/item";
-//    }
+    @PostMapping("add")
+    public String addItemV2(Item item) {
+        itemRepository.save(item);
+        // @ModelAttribute를 자동으로든 수동으로든 사용한다면, addAttribute 자동으로 됨
+        return "basic/item";
+    }
 
     @PostMapping("add")
-    public String addItemV2(Item item, RedirectAttributes redirectAttributes) {
+    public String addItemV3(Item item, RedirectAttributes redirectAttributes) {
         Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
@@ -91,15 +100,6 @@ public class BasicItemController {
         itemRepository.update(itemId, item);
 
         return "redirect:/basic/items/{itemId}";
-    }
-
-    /*
-        테스트용 데이터 추가
-     */
-    @PostConstruct
-    public void init() {
-        itemRepository.save(new Item("itemA", 10000, 10));
-        itemRepository.save(new Item("itemB", 20000, 20));
     }
 
 }
